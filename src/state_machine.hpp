@@ -25,7 +25,10 @@ class StateMachine {
 
 	private:
 	void handle_right_click() {
-
+		for (auto &vertex : vertices) {
+			if (vertex->is_point_inside(GetMousePosition())) {
+			}
+		}
 	}
 
 	public:
