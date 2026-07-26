@@ -1,5 +1,7 @@
-#include "vertex_menu.h"
-#include "global_variables.h"
+#include "vertex_menu.hpp"
+#include "vertex_line.hpp"
+#include "global_variables.hpp"
+#include <cstddef>
 #include <raymath.h>
 #include <cmath>
 #include <raylib.h>
@@ -8,6 +10,7 @@
 #include <string_view>
 #include <iostream>
 #include <utility>
+#include <vector>
 
 enum class VertexState {
 	DRAGGING, IDLE 
@@ -23,6 +26,13 @@ class Vertex {
 	VertexMenu menu; 
 	VertexState state; 
 	Vector2 movement_offset;
+	std::vector<VertexLine> lines; 
+
+	public:
+	size_t spawn_line() {
+		lines.emplace_back(loc, radius);
+		return lines.size() - 1;
+	}
 
 	public:
 	void calculate_movement_offset() {
@@ -88,6 +98,10 @@ class Vertex {
 
 	public:
 	void draw() {
+		for (auto &line : lines) {
+			line.draw();
+		}
+
 		DrawCircle(loc.x, loc.y, radius, WHITE);
 		DrawCircleLines(loc.x, loc.y, radius, BLACK);
 		if (menu.visible) menu.draw();
@@ -95,6 +109,12 @@ class Vertex {
 
 	public:
 	void update(const float &delta_time) {
+		for (auto &line : lines) {
+			if (line.state == VertexLineState::MOVING) {
+				line.update();
+			}
+		}
+
 		if (state == VertexState::IDLE) {
 			return; 
 		}
